@@ -68,12 +68,13 @@
     var logo = doc.getElementById('site-logo');
     if (logo && cfg.title) logo.textContent = cfg.title;
 
+    // 追加而非覆盖，保留 HTML 里写死的「首页」链接
     var navEl = doc.getElementById('site-nav');
-    if (navEl && Array.isArray(cfg.links)) {
-      navEl.innerHTML = cfg.links.map(function (l) {
+    if (navEl && Array.isArray(cfg.links) && cfg.links.length) {
+      navEl.insertAdjacentHTML('beforeend', cfg.links.map(function (l) {
         return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener noreferrer">' +
           esc(l.text) + '</a>';
-      }).join('');
+      }).join(''));
     }
 
     if (cfg.author) {

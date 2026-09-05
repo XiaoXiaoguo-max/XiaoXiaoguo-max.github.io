@@ -2,8 +2,10 @@
   "site": {
     "title": "小过的笔记",
     "desc": "数据开发方向的学习记录与踩坑存档 —— HDFS / Hive / Python / 数仓建模",
-    "author": "杜震佳",
-    "links": []
+    "author": "小过",
+    "links": [
+      { "text": "GitHub", "url": "https://github.com/XiaoXiaoguo-max" }
+    ]
   },
   "posts": [
     {
