@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文章详情</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" id="site-logo" href="index.html">Blog<span class="dot">.</span></a>
+    <nav class="nav" id="site-nav">
+      <a href="index.html">首页</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="post-layout">
+    <article id="article">
+      <div class="loading">正在加载文章…</div>
+    </article>
+    <aside class="toc" id="toc"></aside>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap" id="site-footer">© 2026</div>
+</footer>
+
+<script src="assets/highlight.js"></script>
+<script src="assets/markdown.js"></script>
+<script src="assets/app.js"></script>
+<script>Blog.initPost();</script>
+</body>
+</html>

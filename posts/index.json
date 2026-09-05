@@ -1,0 +1,31 @@
+{
+  "site": {
+    "title": "震佳的技术笔记",
+    "desc": "数据开发方向的学习记录与踩坑存档 —— HDFS / Hive / Python / 数仓建模",
+    "author": "杜震佳",
+    "links": []
+  },
+  "posts": [
+    {
+      "file": "hdfs-commands",
+      "title": "HDFS 常用命令速查手册",
+      "date": "2026-09-05",
+      "tags": ["HDFS", "大数据", "运维"],
+      "summary": "覆盖集群启停、目录管理、文件上传下载删除的高频命令，附实操考核易错点清单。"
+    },
+    {
+      "file": "hive-warehouse-layers",
+      "title": "Hive 数仓分层设计：ODS / DWD / DWS / ADS",
+      "date": "2026-09-02",
+      "tags": ["Hive", "数据仓库", "SQL"],
+      "summary": "四层架构的职责边界、命名规范与建表模板，附一条完整的 ETL 链路示例。"
+    },
+    {
+      "file": "python-metaclass",
+      "title": "Python 元编程：__new__ 与元类的类级别属性生成",
+      "date": "2026-08-28",
+      "tags": ["Python", "元编程"],
+      "summary": "从 __new__ 的执行时机讲起，用元类自动收集类属性，手写一个迷你 ORM 字段系统。"
+    }
+  ]
+}
