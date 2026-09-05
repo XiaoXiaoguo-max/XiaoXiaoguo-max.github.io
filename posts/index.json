@@ -9,6 +9,41 @@
   },
   "posts": [
     {
+      "file": "python-basics",
+      "title": "Python 基础：变量、数据类型与四大容器",
+      "date": "2026-09-05",
+      "tags": ["Python", "基础"],
+      "summary": "动态类型与对象引用、四大容器对比、切片与推导式，附可变默认参数等经典踩坑。"
+    },
+    {
+      "file": "python-functions",
+      "title": "Python 函数进阶：参数、作用域、闭包与装饰器",
+      "date": "2026-09-05",
+      "tags": ["Python", "函数", "装饰器"],
+      "summary": "四种参数形态、LEGB 作用域、闭包原理，手写计时与重试装饰器。"
+    },
+    {
+      "file": "python-oop",
+      "title": "Python 面向对象：类、继承与魔法方法",
+      "date": "2026-09-05",
+      "tags": ["Python", "面向对象"],
+      "summary": "类属性与实例属性、MRO 继承顺序、常用魔法方法、@property 与 __slots__。"
+    },
+    {
+      "file": "python-iterators",
+      "title": "Python 迭代器、生成器与上下文管理器",
+      "date": "2026-09-05",
+      "tags": ["Python", "迭代器", "生成器"],
+      "summary": "for 循环的本质、惰性求值处理大文件、yield 双向通信、with 的实现原理与 itertools。"
+    },
+    {
+      "file": "python-errors-files",
+      "title": "Python 异常处理与文件操作",
+      "date": "2026-09-05",
+      "tags": ["Python", "异常处理", "文件操作"],
+      "summary": "try/except/else/finally 分工、自定义异常、with 读写、pathlib 与 JSON，附大文件读取实践。"
+    },
+    {
       "file": "hdfs-commands",
       "title": "HDFS 常用命令速查手册",
       "date": "2026-09-05",
