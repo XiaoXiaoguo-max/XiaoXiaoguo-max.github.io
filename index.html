@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="个人技术博客">
   <title>个人博客</title>
+  <script>(function(){try{var t=localStorage.getItem('blog-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -14,6 +15,7 @@
     <a class="logo" id="site-logo" href="index.html">Blog<span class="dot">.</span></a>
     <nav class="nav" id="site-nav">
       <a href="index.html">首页</a>
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button>
     </nav>
   </div>
 </header>

@@ -63,6 +63,45 @@
     });
   }
 
+  /* ============ 主题切换 ============ */
+  var THEME_KEY = 'blog-theme';
+
+  function getTheme() {
+    var t = null;
+    try { t = localStorage.getItem(THEME_KEY); } catch (e) { /* 隐私模式忽略 */ }
+    if (t !== 'dark' && t !== 'light') {
+      // 无记录时跟随系统偏好
+      t = (global.matchMedia && global.matchMedia('(prefers-color-scheme: light)').matches)
+        ? 'light' : 'dark';
+    }
+    return t;
+  }
+
+  function applyTheme(t) {
+    doc.documentElement.setAttribute('data-theme', t);
+    var btn = doc.getElementById('theme-toggle');
+    if (btn) {
+      // 按钮图标指向将要切换到的模式
+      btn.textContent = t === 'dark' ? '☀️' : '🌙';
+      var tip = t === 'dark' ? '切换到白天模式' : '切换到夜间模式';
+      btn.title = tip;
+      btn.setAttribute('aria-label', tip);
+    }
+  }
+
+  function initTheme() {
+    applyTheme(getTheme());
+    var btn = doc.getElementById('theme-toggle');
+    if (btn && !btn.getAttribute('data-bound')) {
+      btn.setAttribute('data-bound', '1');
+      btn.addEventListener('click', function () {
+        var next = doc.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* 忽略 */ }
+        applyTheme(next);
+      });
+    }
+  }
+
   // 站点名 / 导航 / 页脚，首页与详情页共用
   function applySiteConfig(cfg) {
     var logo = doc.getElementById('site-logo');
@@ -271,6 +310,8 @@
       });
     });
   }
+
+  initTheme();
 
   global.Blog = { initHome: initHome, initPost: initPost };
 })(window);
