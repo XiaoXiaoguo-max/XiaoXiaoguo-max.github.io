@@ -69,9 +69,9 @@ tags: [Flume, 大数据]
 
 ```json
 "site": {
-  "title": "震佳的技术笔记",
+  "title": "小过的技术笔记",
   "desc": "一句话简介，显示在首页标题下方",
-  "author": "杜震佳",
+  "author": "比比顺",
   "links": [
     { "text": "Gitee", "url": "https://gitee.com/your-id" }
   ]
