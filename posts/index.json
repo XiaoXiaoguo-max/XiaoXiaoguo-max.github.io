@@ -4,6 +4,7 @@
     "desc": "Python 学习之路的记录与踩坑存档",
     "author": "小过",
     "links": [
+      { "text": "MySQL 面试", "url": "mysql-interview.html" },
       { "text": "GitHub", "url": "https://github.com/XiaoXiaoguo-max" }
     ]
   },

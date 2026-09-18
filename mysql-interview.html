@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySQL 面试题大全 · 1-3 年后端社招</title>
+<style>
+  :root{
+    --primary:#2f6fed; --primary-light:#eaf1fe;
+    --text:#24292f; --text-2:#57606a; --border:#d8dee4;
+    --bg:#ffffff; --bg-2:#f6f8fa;
+    --c-idx:#2f6fed; --c-tx:#1a9c6b; --c-mvcc:#8250df; --c-lock:#d4380d; --c-perf:#c2540a;
+    --bg-idx:#eaf1fe; --bg-tx:#e8f7f0; --bg-mvcc:#f3edfd; --bg-lock:#fdeae4; --bg-perf:#fdf2e9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+       color:var(--text);background:var(--bg);line-height:1.75;font-size:15px}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 80px}
+
+  /* ---------- 头部 ---------- */
+  header{background:linear-gradient(135deg,#17325c 0%,#2f6fed 100%);color:#fff;padding:48px 20px 40px}
+  .header-inner{max-width:1020px;margin:0 auto}
+  header h1{font-size:30px;letter-spacing:1px;margin-bottom:10px}
+  header .sub{opacity:.92;font-size:15px}
+  .meta-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+        border-radius:20px;padding:4px 14px;font-size:13px;backdrop-filter:blur(2px)}
+  .stats{display:flex;flex-wrap:wrap;gap:28px;margin-top:22px}
+  .stat b{display:block;font-size:22px}
+  .stat span{font-size:12.5px;opacity:.85}
+
+  /* ---------- TOC ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--border);margin-top:-1px}
+  .nav-inner{max-width:1020px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;padding:8px 20px}
+  .nav-inner a{text-decoration:none;color:var(--text-2);font-size:13.5px;padding:5px 12px;border-radius:6px;transition:.15s}
+  .nav-inner a:hover{background:var(--primary-light);color:var(--primary)}
+
+  /* ---------- 章节 ---------- */
+  section{margin-top:52px}
+  .cat-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .cat-num{font-size:34px;font-weight:800;opacity:.18;letter-spacing:2px}
+  .cat-head h2{font-size:22px}
+  .cat-head .en{font-size:12px;color:var(--text-2);margin-left:8px;font-weight:400}
+  .cat-desc{color:var(--text-2);font-size:13.5px;margin:0 0 20px 52px}
+  .cat-idx .cat-head h2{color:var(--c-idx)} .cat-tx .cat-head h2{color:var(--c-tx)}
+  .cat-mvcc .cat-head h2{color:var(--c-mvcc)} .cat-lock .cat-head h2{color:var(--c-lock)}
+  .cat-perf .cat-head h2{color:var(--c-perf)}
+
+  /* ---------- 题卡 ---------- */
+  .q{border:1px solid var(--border);border-radius:12px;background:var(--bg);margin-bottom:22px;overflow:hidden;
+     box-shadow:0 1px 3px rgba(140,149,159,.12)}
+  .q-head{display:flex;align-items:flex-start;gap:12px;padding:18px 22px 14px;border-bottom:1px dashed var(--border)}
+  .q-no{flex-shrink:0;width:34px;height:34px;border-radius:9px;color:#fff;font-weight:700;font-size:15px;
+        display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .cat-idx .q-no{background:var(--c-idx)} .cat-tx .q-no{background:var(--c-tx)}
+  .cat-mvcc .q-no{background:var(--c-mvcc)} .cat-lock .q-no{background:var(--c-lock)}
+  .cat-perf .q-no{background:var(--c-perf)}
+  .q-title{font-size:16.5px;font-weight:650;line-height:1.5}
+  .q-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .tag{font-size:11.5px;padding:1px 9px;border-radius:10px;background:var(--bg-2);color:var(--text-2);border:1px solid var(--border)}
+  .tag.hot{background:#fdeaea;color:#c0392b;border-color:#f3c1bb}
+  .tag.star{background:#fdf6e3;color:#b07d16;border-color:#ecd9a0}
+  .q-body{padding:16px 22px 20px}
+  .lbl{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;letter-spacing:1px;
+       padding:2px 10px;border-radius:5px;margin-bottom:10px}
+  .lbl-ans{background:var(--bg-2);color:var(--text-2)}
+  .lbl-hot{background:#fdeaea;color:#c0392b}
+  .ans{border-left:3px solid var(--border);padding:2px 0 2px 16px;color:var(--text);margin-bottom:18px}
+  .ans ul{padding-left:20px}
+  .ans li{margin:4px 0}
+  .ans b{color:#111}
+  .follow{background:var(--bg-2);border:1px solid var(--border);border-radius:9px;padding:12px 16px;margin-bottom:6px}
+  .follow .fl{font-size:12.5px;font-weight:700;color:#9a6700;margin-bottom:4px}
+  .follow ul{padding-left:18px;color:var(--text-2);font-size:13.5px}
+  .follow li{margin:3px 0}
+  .fig{margin:18px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .fig-cap{background:var(--bg-2);padding:8px 16px;font-size:13px;font-weight:650;border-bottom:1px solid var(--border)}
+  .fig-cap .en{font-weight:400;color:var(--text-2);font-size:12px}
+  .fig svg{display:block;width:100%;height:auto;background:#fff}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+    background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:13px;color:#24292f}
+  pre{background:#0d1526;color:#dce3ec;border-radius:9px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.7;margin:10px 0}
+  pre code{background:none;border:none;padding:0;color:inherit}
+  .kw{color:#7ee1ff}.cm{color:#7d8b9d;font-style:italic}.st{color:#a8e06a}.fn{color:#ffd479}
+
+  /* ---------- 资源 ---------- */
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .res{border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(140,149,159,.1)}
+  .res h3{font-size:16px;margin-bottom:6px}
+  .res .res-type{font-size:11.5px;color:#fff;background:var(--primary);border-radius:4px;padding:1px 8px;margin-right:8px;vertical-align:2px}
+  .res .res-type.doc{background:#1a9c6b}.res .res-type.video{background:#c2540a}
+  .res .res-type.book{background:#8250df}.res .res-type.blog{background:#d4380d}
+  .res p{font-size:13.5px;color:var(--text-2);margin:6px 0}
+  .res a{color:var(--primary);word-break:break-all}
+  .res .fit{font-size:12.5px;margin-top:8px}
+  .fit b{color:#111}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--text-2);font-size:12.5px;text-align:center}
+
+  /* ---------- 打印 ---------- */
+  @media print{
+    nav{display:none}
+    .q{box-shadow:none;break-inside:avoid}
+    pre{background:#f3f4f6;color:#111}
+    header{background:#17325c !important;-webkit-print-color-adjust:exact}
+  }
+  @media (max-width:760px){.res-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>MySQL 面试题大全</h1>
+    <div class="sub">后端社招 · 资深面试官视角整理 —— 每题附 30 秒口述简答、追问点提示、关键题原理图解</div>
+    <div class="meta-chips">
+      <span class="chip">🎯 定位：1–3 年经验后端开发</span>
+      <span class="chip">📚 5 大主题 × 4 题 = 20 题</span>
+      <span class="chip">⏱ 简答按 30 秒口述节奏编写</span>
+      <span class="chip">🔍 覆盖：索引 / 事务 / MVCC / 锁 / 性能优化</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>20</b><span>核心题目</span></div>
+      <div class="stat"><b>5</b><span>原理图解</span></div>
+      <div class="stat"><b>5</b><span>学习资源</span></div>
+      <div class="stat"><b>60+</b><span>追问点</span></div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#sec-idx">01 索引</a>
+    <a href="#sec-tx">02 事务</a>
+    <a href="#sec-mvcc">03 MVCC</a>
+    <a href="#sec-lock">04 锁机制</a>
+    <a href="#sec-perf">05 性能优化</a>
+    <a href="#sec-res">📚 学习资源</a>
+    <a href="#" onclick="window.print();return false">🖨 打印</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============================================================ -->
+<!-- 一、索引 -->
+<!-- ============================================================ -->
+<section id="sec-idx" class="cat-idx">
+  <div class="cat-head"><span class="cat-num">01</span><h2>索引<span class="en">INDEX</span></h2></div>
+  <p class="cat-desc">索引是 MySQL 面试的第一战场。B+ 树原理、失效场景、覆盖索引几乎是必考三连，务必能画出结构图。</p>
+
+  <!-- Q1 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">1</div>
+      <div>
+        <div class="q-title">为什么 InnoDB 选择 B+ 树做索引结构？对比 B 树、哈希、二叉搜索树各有什么问题？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <ul>
+          <li><b>B+ 树的核心优势：</b>非叶子节点只存键不存数据，单页能放更多键，树更矮胖（3~4 层支撑千万级行）；叶子节点存全部数据且用<b>双向链表</b>串联，范围查询和排序只需顺着链表扫。</li>
+          <li><b>对比 B 树：</b>数据分散在所有节点，单页放的键少、树更高；且范围查询要中序回溯，B+ 树直接沿叶子链表扫。</li>
+          <li><b>对比哈希：</b>哈希等值查询 O(1) 很快，但<b>不支持范围查询和排序</b>，也不支持最左前缀匹配。</li>
+          <li><b>对比二叉/红黑树：</b>二叉树每个节点只有 2 个分支，数据量大时树太高（百万级要 20 层），每层都是一次磁盘 IO，代价不可接受。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>一张表 2000 万行，B+ 树大概几层？怎么估算的？（按 16KB 页 ÷ 键大小算扇出）</li>
+          <li>为什么建议用自增主键？（避免页分裂、写入接近顺序写）</li>
+          <li>跳表（Redis zset）和 B+ 树的取舍？为什么 Redis 用跳表不用 B+ 树？</li>
+          <li>聚簇索引和二级索引在 B+ 树上存的内容有什么区别？</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <div class="fig-cap">图解 1-1 · InnoDB B+ 树索引结构（以主键索引为例）</div>
+        <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker>
+            <marker id="arB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f6fed"/></marker>
+          </defs>
+          <!-- 根节点 -->
+          <rect x="330" y="20" width="240" height="46" rx="8" fill="#eaf1fe" stroke="#2f6fed" stroke-width="1.5"/>
+          <text x="450" y="40" text-anchor="middle" font-size="12" fill="#57606a">根节点（非叶子，只存键 + 指针）</text>
+          <text x="450" y="57" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">15 ｜ 56 ｜ 77</text>
+          <!-- 中间节点 -->
+          <rect x="110" y="120" width="170" height="46" rx="8" fill="#eaf1fe" stroke="#2f6fed" stroke-width="1.5"/>
+          <text x="195" y="150" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">15 ｜ 56</text>
+          <rect x="620" y="120" width="170" height="46" rx="8" fill="#eaf1fe" stroke="#2f6fed" stroke-width="1.5"/>
+          <text x="705" y="150" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">77 ｜ 90</text>
+          <!-- 连线 -->
+          <line x1="380" y1="66" x2="220" y2="120" stroke="#57606a" stroke-width="1.3" marker-end="url(#ar)"/>
+          <line x1="520" y1="66" x2="690" y2="120" stroke="#57606a" stroke-width="1.3" marker-end="url(#ar)"/>
+          <!-- 叶子层标签 -->
+          <text x="450" y="112" text-anchor="middle" font-size="12" fill="#8b949e">第 2 层（中间节点）</text>
+          <!-- 叶子节点 -->
+          <g>
+            <rect x="40" y="240" width="150" height="58" rx="8" fill="#f0fff6" stroke="#1a9c6b" stroke-width="1.5"/>
+            <text x="115" y="263" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">10 ｜ 15</text>
+            <text x="115" y="284" text-anchor="middle" font-size="11" fill="#57606a">完整行数据</text>
+          </g>
+          <g>
+            <rect x="230" y="240" width="150" height="58" rx="8" fill="#f0fff6" stroke="#1a9c6b" stroke-width="1.5"/>
+            <text x="305" y="263" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">20 ｜ 56</text>
+            <text x="305" y="284" text-anchor="middle" font-size="11" fill="#57606a">完整行数据</text>
+          </g>
+          <g>
+            <rect x="420" y="240" width="150" height="58" rx="8" fill="#f0fff6" stroke="#1a9c6b" stroke-width="1.5"/>
+            <text x="495" y="263" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">66 ｜ 77</text>
+            <text x="495" y="284" text-anchor="middle" font-size="11" fill="#57606a">完整行数据</text>
+          </g>
+          <g>
+            <rect x="610" y="240" width="150" height="58" rx="8" fill="#f0fff6" stroke="#1a9c6b" stroke-width="1.5"/>
+            <text x="685" y="263" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">80 ｜ 90</text>
+            <text x="685" y="284" text-anchor="middle" font-size="11" fill="#57606a">完整行数据</text>
+          </g>
+          <!-- 连线到叶子 -->
+          <line x1="160" y1="166" x2="110" y2="240" stroke="#57606a" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="230" y1="166" x2="290" y2="240" stroke="#57606a" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="700" y1="166" x2="590" y2="240" stroke="#57606a" stroke-width="1.2" marker-end="url(#ar)"/>
+          <line x1="720" y1="166" x2="690" y2="240" stroke="#57606a" stroke-width="1.2" marker-end="url(#ar)"/>
+          <!-- 双向链表 -->
+          <line x1="190" y1="269" x2="230" y2="269" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <line x1="380" y1="269" x2="420" y2="269" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <line x1="570" y1="269" x2="610" y2="269" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <line x1="230" y1="283" x2="190" y2="283" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <line x1="420" y1="283" x2="380" y2="283" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <line x1="610" y1="283" x2="570" y2="283" stroke="#2f6fed" stroke-width="2" marker-end="url(#arB)"/>
+          <!-- 注释 -->
+          <text x="450" y="230" text-anchor="middle" font-size="12" fill="#8b949e">叶子层（存数据，双向链表串联 → 范围查询沿链表顺序扫）</text>
+          <rect x="70" y="335" width="760" height="48" rx="8" fill="#fff8e6" stroke="#ecd9a0"/>
+          <text x="450" y="355" text-anchor="middle" font-size="13" fill="#7d5a00">💡 3~4 层即可支撑千万行：根节点常驻内存，一次查询最多 3~4 次磁盘 IO；</text>
+          <text x="450" y="374" text-anchor="middle" font-size="13" fill="#7d5a00">非叶子节点只存键 → 单页 16KB 可放几百个键 → 扇出大、树身矮</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">2</div>
+      <div>
+        <div class="q-title">哪些 SQL 写法会导致索引失效？平时怎么验证？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">实战</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>常见的失效场景有六类，验证方式是 <code>EXPLAIN</code> 看 <code>key</code> 是否命中、<code>type</code> 是否为 <code>ALL</code>：</p>
+        <ul>
+          <li><b>最左前缀被破坏：</b>联合索引 <code>(a,b,c)</code> 只用 <code>b</code> 查、或条件里对 <code>a</code> 用了范围后 <code>c</code> 失效；</li>
+          <li><b>对索引列做函数或运算：</b><code>YEAR(create_time)=2026</code>、<code>id+1=10</code>；</li>
+          <li><b>隐式类型转换：</b>字符串列用数字查（<code>phone = 13800000000</code>），相当于套了一层 cast 函数；</li>
+          <li><b>左模糊：</b><code>LIKE '%xx'</code> 前缀不确定，无法走 B+ 树有序性（<code>'xx%'</code> 可以走）；</li>
+          <li><b>OR 连接了非索引列</b>（两列都有索引时可以走 index merge）；</li>
+          <li><b>不符合取值比例</b>：优化器估算回表成本高于全表扫描时主动放弃（大表的 <code>!=</code>、<code>NOT IN</code> 常见）。</li>
+        </ul>
+        <p>最后一点值得主动强调：<b>索引失效不一定是写法问题，也可能 是「统计信息不准 / 区分度低 / 回表成本高」导致的优化器主动放弃</b>——这句能让面试官知道你真的排查过。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li><code>LIKE '%xx%'</code> 一定不能走索引吗？（覆盖索引下可全索引扫描；或虚拟列 + 前缀索引）</li>
+          <li><code>NOT IN</code>、<code>!=</code> 一定不走索引吗？（结果集小时可以走，优化器看成本）</li>
+          <li>隐式转换具体是怎么让索引失效的？字符串列和数字列，哪边转哪边？</li>
+          <li>怎么让统计信息更新？(<code>ANALYZE TABLE</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">3</div>
+      <div>
+        <div class="q-title">什么是回表和覆盖索引？为什么说覆盖索引能显著提升查询性能？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>InnoDB 二级索引的叶子节点存的是「索引列 + 主键值」，不存整行。<b>回表</b>：通过二级索引找到主键后，还要再去聚簇索引里取完整行，等于查两棵树。<b>覆盖索引</b>：查询需要的字段全部包含在索引里，直接从索引就拿到结果，省掉回表。</p>
+        <p>收益有两层：一是省去回表的随机 IO（这是主要收益）；二是索引体积远小于整行，同样页数能缓存更多数据。判断方法：<code>EXPLAIN</code> 的 Extra 出现 <code>Using index</code> 就是覆盖索引。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>常见实战：查手机号是否存在，<code>SELECT id FROM user WHERE phone = ?</code> 建什么索引最优？</li>
+          <li>为什么 <code>SELECT *</code> 是坏习惯？（几乎不可能覆盖索引，且破坏网络/存储）</li>
+          <li>索引下推（ICP）是什么？5.6 引入后对回表有什么影响？（在存储引擎层先过滤，减少回表次数）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">4</div>
+      <div>
+        <div class="q-title">联合索引 (a, b, c) 的顺序怎么设计？谈谈你的索引设计方法论。</div>
+        <div class="q-tags"><span class="tag">设计</span><span class="tag star">区分度题</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>核心原则：<b>「最左前缀」匹配下，把查询最多、区分度最高的列放前面；等值列在前、范围列在后</b>（范围条件之后的列停止走索引）。同时结合实际业务 SQL 统计：优先为高频、高并发查询建；考虑覆盖索引让常用查询免回表；避免冗余索引（已有 <code>(a,b)</code> 就不必再建 <code>(a)</code>）；长字符串用前缀索引控制长度。</p>
+        <p>索引不是越多越好：每个索引都是一棵 B+ 树，拖慢写入、占空间，优化器选择成本也变高。单表建议控制在个位数。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>区分度怎么算？（<code>COUNT(DISTINCT col)/COUNT(*)</code>，经验值 &gt; 0.1 更佳）</li>
+          <li><code>WHERE a=1 ORDER BY b</code>，联合索引怎么建能避免 filesort？(<code>(a,b)</code>，排序也走索引有序性)</li>
+          <li>前缀索引的长度怎么选？有什么代价？（无法覆盖索引、无法做 ORDER BY 优化）</li>
+          <li>建索引有什么副作用？写入路径上发生了什么？</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 二、事务 -->
+<!-- ============================================================ -->
+<section id="sec-tx" class="cat-tx">
+  <div class="cat-head"><span class="cat-num">02</span><h2>事务<span class="en">TRANSACTION</span></h2></div>
+  <p class="cat-desc">ACID 的「实现方式」和隔离级别是事务的两条主考线。答出「是什么」只能及格，答出「InnoDB 怎么实现的」才有竞争力。</p>
+
+  <!-- Q5 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">5</div>
+      <div>
+        <div class="q-title">ACID 分别是什么？InnoDB 靠什么机制实现每一个特性？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>ACID 是事务的四个特性，<b>InnoDB 每个特性都有明确的落地机制</b>——这是本题的加分点：</p>
+        <ul>
+          <li><b>原子性 A</b>：<code>undo log</code>（回滚日志），失败时按 undo 逆向补偿回滚；</li>
+          <li><b>持久性 D</b>：<code>redo log</code>（重做日志），WAL 先写日志再刷脏页，崩溃后重放恢复；</li>
+          <li><b>隔离性 I</b>：<b>MVCC + 锁</b>，读靠多版本快照，写靠行锁 / 间隙锁；</li>
+          <li><b>一致性 C</b>：是最终目的，由 A、I、D 加上应用层约束（外键、唯一约束、业务逻辑）共同保证。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>redo log 和 binlog 都是日志，为什么要有两个？</li>
+          <li>undo log 既然能恢复数据，为什么还需要 redo log？（一个是逻辑反向操作 vs 物理页重放，性能差异）</li>
+          <li>WAL 是什么思想？为什么先写日志比先刷数据页快？（顺序写 vs 随机写）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">6</div>
+      <div>
+        <div class="q-title">讲讲四个事务隔离级别，分别解决什么并发问题？InnoDB 默认用哪个？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">概念</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>并发事务有三类问题：<b>脏读</b>（读到别人未提交的数据）、<b>不可重复读</b>（前后两次读同一行值不同，他人 update 提交）、<b>幻读</b>（前后两次范围查询行数不同，他人 insert 提交）。四个级别逐级解决：</p>
+        <ul>
+          <li><b>读未提交 RU</b>：什么都不防，有脏读；</li>
+          <li><b>读已提交 RC</b>：防脏读（Oracle / PG 默认）；</li>
+          <li><b>可重复读 RR</b>：再防不可重复读，<b>InnoDB 默认级别</b>，且通过 MVCC + Next-Key 锁基本解决幻读；</li>
+          <li><b>串行化</b>：全部加锁串行执行，最安全性能最差。</li>
+        </ul>
+        <p>一句话收尾：MySQL 的 RR 与 SQL 标准的 RR 不完全一样——标准 RR 允许幻读，而 InnoDB 的 RR 借助 Next-Key 锁在当前读下也能防幻读。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>为什么互联网公司（尤其阿里系规范）常把默认级别改成 RC？（减少间隙锁、降低死锁概率，Binlog 需改 ROW 格式）</li>
+          <li>RC 和 RR 下 MVCC 的 ReadView 生成时机有什么区别？（见第 12 题）</li>
+          <li>怎么查看和设置隔离级别？(<code>SELECT @@transaction_isolation</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">7</div>
+      <div>
+        <div class="q-title">MySQL 的 RR 隔离级别真的能完全避免幻读吗？</div>
+        <div class="q-tags"><span class="tag hot">高频陷阱题</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>分两种读法回答。RR 下 InnoDB 用两套手段防幻读：</p>
+        <ul>
+          <li><b>快照读</b>（普通 SELECT）：靠 MVCC，ReadView 在事务第一次读时生成并沿用，后续读的始终是同一快照，看不到别人新插入的行；</li>
+          <li><b>当前读</b>（<code>SELECT ... FOR UPDATE</code>、<code>UPDATE</code>、<code>DELETE</code>）：靠 <b>Next-Key Lock</b>（行锁 + 间隙锁）锁住范围，别人无法在范围内插入。</li>
+        </ul>
+        <p><b>但混用两种读法时幻读仍会发生</b>：先快照读（不建锁），别人 insert 并提交，再当前读——这时就能看到「幻影行」了。先当前读再快照读，也能看到已提交插入。所以标准答案是：<b>基本防住，但不能 100% 防</b>。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>举一个具体能复现幻读的 SQL 序列（两个 session 交错执行的例子）</li>
+          <li>要彻底防幻读怎么办？（事务一开始就用 <code>SELECT ... FOR UPDATE</code> 锁住范围，或升级到串行化）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">8</div>
+      <div>
+        <div class="q-title">redo log、undo log、binlog 各起什么作用？两阶段提交是干什么的？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <ul>
+          <li><b>redo log</b>：InnoDB 引擎层物理日志，保证<b>持久性</b>，崩溃恢复时重放已提交的修改；循环写、固定大小；</li>
+          <li><b>undo log</b>：InnoDB 逻辑日志，保证<b>原子性</b>（回滚）+ 是 MVCC 版本链的载体；</li>
+          <li><b>binlog</b>：Server 层逻辑日志，用于<b>主从复制和数据恢复</b>，追加写，有 STATEMENT / ROW / MIXED 三种格式。</li>
+        </ul>
+        <p>redo log 和 binlog 是两个独立的日志系统，一个事务可能「redo 写了、binlog 没写」。<b>两阶段提交</b>就是让它们保持一致：redo log 先写 <code>prepare</code> → 写 binlog → redo log 置为 <code>commit</code>。崩溃恢复时：redo 处于 prepare 且 binlog 完整 → 提交；binlog 不完整 → 回滚。这样保证「要么两边都成功，要么都失败」。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>组提交（group commit）了解吗？为什么 5.7/8.0 提交性能大幅提升？</li>
+          <li>redo log 写满了会发生什么？（刷脏页，业务写入被阻塞，check point 机制）</li>
+          <li>binlog 的 ROW 和 STATEMENT 格式各有什么优缺点？主从复制用哪种？为什么？</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <div class="fig-cap">图解 2-1 · redo log 与 binlog 的两阶段提交</div>
+        <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+          <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+          <!-- 时间轴 -->
+          <line x1="60" y1="200" x2="850" y2="200" stroke="#57606a" stroke-width="1.5" marker-end="url(#ar2)"/>
+          <text x="860" y="205" font-size="12" fill="#57606a" text-anchor="end">t</text>
+          <!-- 三个步骤 -->
+          <g>
+            <rect x="80" y="30" width="200" height="120" rx="10" fill="#f3edfd" stroke="#8250df" stroke-width="1.5"/>
+            <text x="180" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">① redo log</text>
+            <text x="180" y="82" text-anchor="middle" font-size="14" font-weight="700" fill="#8250df">prepare</text>
+            <text x="180" y="108" text-anchor="middle" font-size="12" fill="#57606a">写盘，事务状态</text>
+            <text x="180" y="126" text-anchor="middle" font-size="12" fill="#57606a">「准备提交」</text>
+          </g>
+          <g>
+            <rect x="340" y="30" width="200" height="120" rx="10" fill="#e8f7f0" stroke="#1a9c6b" stroke-width="1.5"/>
+            <text x="440" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">② 写 binlog</text>
+            <text x="440" y="86" text-anchor="middle" font-size="12" fill="#57606a">Server 层记录</text>
+            <text x="440" y="104" text-anchor="middle" font-size="12" fill="#57606a">完整事务逻辑</text>
+            <text x="440" y="126" text-anchor="middle" font-size="12" fill="#1a9c6b">并 fsync 落盘</text>
+          </g>
+          <g>
+            <rect x="600" y="30" width="200" height="120" rx="10" fill="#eaf1fe" stroke="#2f6fed" stroke-width="1.5"/>
+            <text x="700" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">③ redo log</text>
+            <text x="700" y="82" text-anchor="middle" font-size="14" font-weight="700" fill="#2f6fed">commit</text>
+            <text x="700" y="108" text-anchor="middle" font-size="12" fill="#57606a">事务正式提交</text>
+            <text x="700" y="126" text-anchor="middle" font-size="12" fill="#57606a">对用户返回成功</text>
+          </g>
+          <line x1="280" y1="90" x2="340" y2="90" stroke="#57606a" stroke-width="1.5" marker-end="url(#ar2)"/>
+          <line x1="540" y1="90" x2="600" y2="90" stroke="#57606a" stroke-width="1.5" marker-end="url(#ar2)"/>
+          <!-- 崩溃点 -->
+          <g>
+            <line x1="310" y1="200" x2="310" y2="170" stroke="#d4380d" stroke-width="2" stroke-dasharray="4 3"/>
+            <circle cx="310" cy="200" r="5" fill="#d4380d"/>
+            <text x="310" y="222" text-anchor="middle" font-size="12" fill="#d4380d">若在这崩溃：binlog 未写 → 回滚</text>
+          </g>
+          <g>
+            <line x1="570" y1="200" x2="570" y2="170" stroke="#1a9c6b" stroke-width="2" stroke-dasharray="4 3"/>
+            <circle cx="570" cy="200" r="5" fill="#1a9c6b"/>
+            <text x="570" y="222" text-anchor="middle" font-size="12" fill="#1a9c6b">若在这崩溃：binlog 完整 → 提交</text>
+          </g>
+          <text x="450" y="16" text-anchor="middle" font-size="13" fill="#57606a">崩溃恢复时以 binlog 是否完整为准绳，保证 redo 与 binlog 永不「半提交」</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 三、MVCC -->
+<!-- ============================================================ -->
+<section id="sec-mvcc" class="cat-mvcc">
+  <div class="cat-head"><span class="cat-num">03</span><h2>MVCC<span class="en">MULTI-VERSION CONCURRENCY CONTROL</span></h2></div>
+  <p class="cat-desc">MVCC 是 1-3 年面试的「分水岭」题：答得出 ReadView 判定规则基本直接过，答不出基本挂。建议整节背诵。</p>
+
+  <!-- Q9 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">9</div>
+      <div>
+        <div class="q-title">什么是 MVCC？它解决了什么问题？由哪几部分实现？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag star">核心分水岭</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>MVCC 是多版本并发控制：普通读操作不加锁，而是读取数据的一个<b>历史版本快照</b>，从而实现「读写不冲突」——读不阻塞写、写不阻塞读，大幅提升并发性能。</p>
+        <p>InnoDB 的 MVCC 由三部分协作实现：</p>
+        <ul>
+          <li><b>隐藏列：</b>每行有 <code>trx_id</code>（最后修改它的事务 id）和 <code>roll_pointer</code>（指向 undo log 里的旧版本）；</li>
+          <li><b>undo log 版本链：</b>每次修改都把旧版本留在 undo log 里，通过 roll_pointer 串成链；</li>
+          <li><b>ReadView（读视图）：</b>事务做快照读时的「活跃事务名单」，决定当前能看到链上哪个版本。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>「读写不冲突」相比纯锁方案性能好在哪里？</li>
+          <li>MVCC 只在 RC 和 RR 两个级别下生效，为什么 RU 和串行化不需要？</li>
+          <li>update 会不会新建版本？删Delete 呢？（删除是打 delete mark，purge 线程物理清理）</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <div class="fig-cap">图解 3-1 · undo log 版本链 + ReadView 可见性判定</div>
+        <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+          <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8250df"/></marker></defs>
+          <!-- 当前行 -->
+          <rect x="40" y="30" width="230" height="110" rx="10" fill="#eaf1fe" stroke="#2f6fed" stroke-width="1.6"/>
+          <text x="155" y="55" text-anchor="middle" font-size="13.5" font-weight="700" fill="#24292f">当前记录（B+ 树上）</text>
+          <text x="60" y="80" font-size="12.5" fill="#24292f">name = 'C'（新值）</text>
+          <text x="60" y="100" font-size="12.5" fill="#24292f">trx_id = <tspan font-weight="700" fill="#c2540a">200</tspan></text>
+          <text x="60" y="120" font-size="12.5" fill="#24292f">roll_pointer ⤵</text>
+          <!-- 版本2 -->
+          <rect x="335" y="30" width="230" height="110" rx="10" fill="#f3edfd" stroke="#8250df" stroke-width="1.6"/>
+          <text x="450" y="55" text-anchor="middle" font-size="13.5" font-weight="700" fill="#24292f">undo log 版本 2</text>
+          <text x="355" y="80" font-size="12.5" fill="#24292f">name = 'B'</text>
+          <text x="355" y="100" font-size="12.5" fill="#24292f">trx_id = <tspan font-weight="700" fill="#c2540a">150</tspan></text>
+          <text x="355" y="120" font-size="12.5" fill="#24292f">roll_pointer ⤵</text>
+          <!-- 版本1 -->
+          <rect x="630" y="30" width="230" height="110" rx="10" fill="#f3edfd" stroke="#8250df" stroke-width="1.6"/>
+          <text x="745" y="55" text-anchor="middle" font-size="13.5" font-weight="700" fill="#24292f">undo log 版本 1</text>
+          <text x="765" y="80" font-size="12.5" fill="#24292f">name = 'A'（最初值）</text>
+          <text x="765" y="100" font-size="12.5" fill="#24292f">trx_id = <tspan font-weight="700" fill="#c2540a">100</tspan></text>
+          <text x="765" y="120" font-size="12.5" fill="#24292f">roll_pointer = NULL</text>
+          <!-- 版本链箭头 -->
+          <line x1="270" y1="85" x2="333" y2="85" stroke="#8250df" stroke-width="2" marker-end="url(#ar3)"/>
+          <line x1="565" y1="85" x2="628" y2="85" stroke="#8250df" stroke-width="2" marker-end="url(#ar3)"/>
+          <text x="450" y="20" text-anchor="middle" font-size="12.5" fill="#57606a">← 沿 roll_pointer 串成<b>版本链</b>（从新到旧）</text>
+          <!-- ReadView -->
+          <rect x="130" y="200" width="640" height="140" rx="12" fill="#fff8e6" stroke="#ecd9a0" stroke-width="1.6"/>
+          <text x="450" y="228" text-anchor="middle" font-size="15" font-weight="800" fill="#7d5a00">ReadView（当前事务开启快照读时生成）</text>
+          <g font-size="13" fill="#24292f">
+            <text x="160" y="258">m_ids   = [150, 200]   <tspan fill="#57606a" font-size="11.5">（生成视图时，活跃【未提交】事务 id 列表）</tspan></text>
+            <text x="160" y="283">min_trx_id = 150         <tspan fill="#57606a" font-size="11.5">（活跃中最小的）</tspan></text>
+            <text x="160" y="308">max_trx_id = 300         <tspan fill="#57606a" font-size="11.5">（下一个将分配的事务 id，非最大活跃）</tspan></text>
+            <text x="160" y="333">creator_trx_id = 150  <tspan fill="#57606a" font-size="11.5">（创建这个视图的事务自己，可见）</tspan></text>
+          </g>
+          <!-- 判定规则 -->
+          <rect x="40" y="368" width="820" height="52" rx="9" fill="#fdeae4" stroke="#d4380d" stroke-width="1.4"/>
+          <text x="450" y="389" text-anchor="middle" font-size="13" fill="#a4270a"><tspan font-weight="800">可见性判定（自链头往下找第一个可见版本）：</tspan>trx_id == creator → 可见 ｜  trx_id &lt; min → 已提交 → 可见</text>
+          <text x="450" y="409" text-anchor="middle" font-size="13" fill="#a4270a">trx_id ≥ max → 之后才开启 → 不可见 ｜  min ≤ trx_id &lt; max 且在 m_ids 里 → 还未提交 → 不可见（沿链回溯旧版本）</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">10</div>
+      <div>
+        <div class="q-title">RC 和 RR 的 ReadView 生成时机有什么区别？这带来了什么效果差异？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>这是 RC 和 RR 实现差异的本质，就一句话：</p>
+        <ul>
+          <li><b>RC（读已提交）：</b><b>每次 SELECT</b> 都重新生成一个 ReadView —— 别人提交了就能看到，所以「不可重复读」；</li>
+          <li><b>RR（可重复读）：</b><b>事务内第一次 SELECT</b> 时生成，之后整个事务复用 —— 无论别人提交多少次，看到的都是同一快照，所以「可重复读」。</li>
+        </ul>
+        <p>换句话说，RR 的「可重复读」不是锁出来的，而是<b>把 ReadView 冻结在事务第一次读的时刻</b>实现的。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>「事务开始」和「第一次快照读」是一回事吗？(<code>BEGIN</code> 不会立刻生成 ReadView，<code>START TRANSACTION WITH CONSISTENT SNAPSHOT</code> 才会)</li>
+          <li>RR 下事务开启很久后查询，为什么数据「停在旧时刻」？ undo 链很长会不会有问题？（会，见 Q12）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">11</div>
+      <div>
+        <div class="q-title">快照读和当前读的区别是什么？哪些 SQL 是当前读？</div>
+        <div class="q-tags"><span class="tag">概念</span><span class="tag star">联动 Q7</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p><b>快照读</b>：读 MVCC 的历史版本，不加锁。就是普通 <code>SELECT</code>（RC/RR 下）。</p>
+        <p><b>当前读</b>：读最新已提交版本，并对记录加锁。所有修改语句隐含当前读，显式当前读是 <code>SELECT ... FOR UPDATE</code> / <code>FOR SHARE</code>。例如 <code>UPDATE t SET x=x+1</code> 必须基于最新值加 1，不能基于快照。</p>
+        <p>两者混用正是 RR 下幻读残留的根源（呼应第 7 题）。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li><code>UPDATE</code> 修改的是快照还是最新版本？如果目标行已被别的事务改过会怎样？（当前读 + 行锁阻塞等待）</li>
+          <li><code>FOR UPDATE</code> 和 <code>FOR SHARE</code>（8.0 前叫 LOCK IN SHARE MODE）加的锁有什么区别？</li>
+          <li>半一致读（semi-consistent read）听说过吗？（RC 下 update 的优化）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">12</div>
+      <div>
+        <div class="q-title">为什么长事务危害大？它和 MVCC、undo log 有什么关系？</div>
+        <div class="q-tags"><span class="tag">实战</span><span class="tag star">综合题</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>长事务有三大危害，前两个都和 MVCC 直接相关：</p>
+        <ul>
+          <li><b>undo 无法清理：</b>一个 RR 事务长时间不提交，它持有的 ReadView 之前的所有 undo 版本都不能被 purge 线程删除，<b>undo 表空间持续膨胀</b>，版本链越拉越长，所有访问该行的查询回溯成本变高；</li>
+          <li><b>锁长期持有：</b>行锁、间隙锁在事务结束才释放，并发度骤降、死锁概率上升；</li>
+          <li><b>主从延迟：</b>大事务 binlog 传输和回放都是大块操作，8.0 之前大事务提交还会卡顿。</li>
+        </ul>
+        <p>排查：<code>information_schema.innodb_trx</code> 看 <code>trx_started</code>；治理：拆小事务、避免事务里放 RPC/IO、监控自动提交配置。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>怎么找出当前运行最久的几个事务？（<code>SELECT ... FROM information_schema.innodb_trx ORDER BY trx_started</code>）</li>
+          <li>为什么「事务里调外部接口」是反模式？怎么改？</li>
+          <li>purge 线程什么时候干活？undo 表空间膨胀过大还能缩回去吗？（8.0 支持自动 truncate）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 四、锁机制 -->
+<!-- ============================================================ -->
+<section id="sec-lock" class="cat-lock">
+  <div class="cat-head"><span class="cat-num">04</span><h2>锁机制<span class="en">LOCK</span></h2></div>
+  <p class="cat-desc">锁的考察重点是「加锁范围」——尤其是间隙锁。死锁案例题建议提前准备一个自己亲历的故事。</p>
+
+  <!-- Q13 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">13</div>
+      <div>
+        <div class="q-title">InnoDB 有哪几种行级锁？Record Lock、Gap Lock、Next-Key Lock 分别锁什么范围？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">原理</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <ul>
+          <li><b>Record Lock（记录锁）：</b>只锁索引上的一条记录；</li>
+          <li><b>Gap Lock（间隙锁）：</b>锁两条索引记录之间的<b>开区间</b>，只挡 insert，别的事务可以互相持有同一间隙的锁；</li>
+          <li><b>Next-Key Lock：</b>记录锁 + 前面的间隙，即<b>左开右闭区间 (a, b]</b>，是 RR 下加锁的默认单位，用来防止当前读下的幻读。</li>
+        </ul>
+        <p>补充一个高频细节：唯一索引等值查询<b>命中记录</b>时，Next-Key Lock 退化为纯 Record Lock；<b>未命中</b>时退化为 Gap Lock（锁住它本应所在的间隙）。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>RR 是默认加 Next-Key Lock 的，什么场景下会退化？（如上；以及 RC 下没有 Gap/Next-Key）</li>
+          <li>插入意向锁（insert intention lock）是什么？和 Gap Lock 什么关系？</li>
+          <li>间隙锁只在 RR 下存在吗？RC 下为什么没有？（RC 用最新读解决脏读，不需要防幻读）</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <div class="fig-cap">图解 4-1 · 三种行锁的锁定范围（索引上已有记录 10、20、30）</div>
+        <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+          <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+          <!-- 数轴 -->
+          <line x1="80" y1="140" x2="840" y2="140" stroke="#24292f" stroke-width="2" marker-end="url(#ar4)"/>
+          <!-- 刻度 -->
+          <g>
+            <circle cx="150" cy="140" r="7" fill="#2f6fed"/>
+            <text x="150" y="172" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">id=10</text>
+            <circle cx="430" cy="140" r="7" fill="#2f6fed"/>
+            <text x="430" y="172" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">id=20</text>
+            <circle cx="710" cy="140" r="7" fill="#2f6fed"/>
+            <text x="710" y="172" text-anchor="middle" font-size="15" font-weight="700" fill="#24292f">id=30</text>
+          </g>
+          <!-- Record Lock -->
+          <rect x="138" y="95" width="24" height="24" rx="5" fill="#fdeaea" stroke="#d4380d" stroke-width="2"/>
+          <line x1="150" y1="100" x2="150" y2="108" stroke="#d4380d" stroke-width="0"/>
+          <text x="480" y="30" font-size="13.5" font-weight="700" fill="#d4380d">① Record Lock：只锁 id=20 这一个点</text>
+          <line x1="475" y1="36" x2="440" y2="95" stroke="#d4380d" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <!-- Gap Lock -->
+          <rect x="150" y="125" width="280" height="30" rx="6" fill="#e8f7f0" stroke="#1a9c6b" stroke-width="1.8"/>
+          <text x="290" y="145" text-anchor="middle" font-size="12.5" font-weight="700" fill="#116149">(10, 20) 开区间</text>
+          <text x="290" y="215" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1a9c6b">② Gap Lock：锁 (10,20) 间隙 —— 只拦 INSERT，不锁 10 和 20 本身</text>
+          <line x1="290" y1="205" x2="290" y2="158" stroke="#1a9c6b" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <!-- Next-Key -->
+          <rect x="430" y="230" width="280" height="34" rx="6" fill="#fdf2e9" stroke="#c2540a" stroke-width="1.8"/>
+          <rect x="424" y="121" width="14" height="38" rx="3" fill="#fdf2e9" stroke="#c2540a" stroke-width="2"/>
+          <rect x="438" y="121" width="272" height="38" rx="3" fill="#fdf2e9" stroke="#c2540a" stroke-width="2" stroke-dasharray="1 0"/>
+          <text x="570" y="145" text-anchor="middle" font-size="12.5" font-weight="700" fill="#8a3a00">(10, 20] 左开右闭</text>
+          <text x="570" y="285" text-anchor="middle" font-size="13.5" font-weight="700" fill="#c2540a">③ Next-Key Lock：Gap + Record —— 锁 (10,20]，含 20 本身（RR 默认）</text>
+          <line x1="570" y1="275" x2="570" y2="196" stroke="#c2540a" stroke-width="1.2" stroke-dasharray="3 3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">14</div>
+      <div>
+        <div class="q-title">「UPDATE ... WHERE 非索引列」为什么危险？InnoDB 的加锁规则和索引是什么关系？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">实战</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>核心结论：<b>行锁是加在索引上的</b>。</p>
+        <ul>
+          <li>WHERE 条件<b>没走索引</b>：行锁无处安放，退化为<b>给全表所有记录加 Next-Key Lock</b>，等价于锁全表，并发全挂；</li>
+          <li>走<b>联合索引</b>：按索引扫描到的范围加锁。索引前缀能定位多少，就锁多少，前缀失效的部分继续向后扩；</li>
+          <li>走<b>唯一索引等值命中</b>：只锁这一条（Record Lock）；<b>普通索引等值</b>：向右扫到第一个不满足的值为止，最后一个还会补 Gap Lock。</li>
+        </ul>
+        <p>所以「update 无索引列」和「RR 大范围间隙锁」是生产上批量误伤 / 死锁激增的前两名。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>两个事务分别 update 不同主键，会互相阻塞吗？（不会；但如果查询条件无索引，会全表锁而互相等）</li>
+          <li>怎么看当前持锁和等待？（<code>performance_schema.data_locks</code> / <code>data_lock_waits</code>，8.0）</li>
+          <li>唯一索引等值未命中、普通索引等值命中，分别锁什么范围？（Gap Lock / 多条 Record + 末端 Gap）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">15</div>
+      <div>
+        <div class="q-title">讲一个死锁场景：怎么产生的、怎么排查、怎么解决？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag star">案例题</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>经典场景——<b>两个事务相反顺序更新两条记录</b>：事务 A 先 update id=1 再要 id=2；事务 B 先 update id=2 再要 id=1，互相持有对方需要的锁，形成环状等待。InnoDB 检测到「等待图」成环后，<b>回滚代价较小的事务</b>并报 Deadlock found 错误（1213）。</p>
+        <p>更隐蔽的一类是 <b>Gap Lock 引发的插入死锁</b>：两个事务先 SELECT...FOR UPDATE 没查到 → 都持有同一 Gap 锁（间隙锁相容）→ 都去 INSERT → 各自等待对方释放间隙 → 死锁。</p>
+        <p><b>排查：</b><code>SHOW ENGINE INNODB STATUS</code> 看 LATEST DETECTED DEADLOCK 段，包含两个事务的 SQL 和持有的锁。</p>
+        <p><b>预防四板斧：</b>① 按固定顺序访问资源（如统一按主键升序）；② 小事务、尽快提交；③ 减少 RR 下的范围条件触发间隙锁；④ 必要时用 RC 或显式锁替代隐式范围锁。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>InnoDB 死锁检测（waits-for graph）和锁等待超时（<code>innodb_lock_wait_timeout</code>）两条路有什么区别？</li>
+          <li>高并发热点行更新有什么优化思路？（拆行、队列化、CAS 乐观锁、降隔离级别）</li>
+          <li>拿到 1213 错误之后业务上应该怎么处理？（捕获重试，注意幂等）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">16</div>
+      <div>
+        <div class="q-title">乐观锁和悲观锁的区别？在业务里怎么选？</div>
+        <div class="q-tags"><span class="tag">概念 + 设计</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p><b>悲观锁</b>：假设冲突频繁，取数据时就加锁，别人阻塞等待。数据库层就是 <code>FOR UPDATE</code>；适合写多、临界区复杂、必须串行的场景（账户冻结、库存扣减热点行）。</p>
+        <p><b>乐观锁</b>：假设冲突少，不加锁，更新时校验版本——<code>UPDATE t SET x=?, version=version+1 WHERE id=? AND version=?</code>，影响行数为 0 说明别人改过，业务重试或报冲突。适合读多写少、可重试的场景（CMS 内容、订单状态流转）。</p>
+        <p>选择依据：<b>冲突概率低选乐观（省锁开销），冲突高选悲观（避免大量重试空转）</b>；热点极端场景两者都退化，要走队列 / 缓存扣减 / 拆分热点。</p>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>乐观锁的 ABA 问题在 MySQL 会出现吗？（用单调 version 就没有；用状态字段可能「绕一圈回来」）</li>
+          <li>秒杀扣库存用悲观锁还是乐观锁？怎么扛住热点？（预扣 + 异步落库 / Redis 原子扣减再同步 DB）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 五、性能优化 -->
+<!-- ============================================================ -->
+<section id="sec-perf" class="cat-perf">
+  <div class="cat-head"><span class="cat-num">05</span><h2>性能优化<span class="en">PERFORMANCE</span></h2></div>
+  <p class="cat-desc">考察的是「方法论」而不是背参数：慢查询定位 → 分析 → 优化 → 验证的闭环，答出体系感最加分。</p>
+
+  <!-- Q17 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">17</div>
+      <div>
+        <div class="q-title">线上一条 SQL 突然变慢，你的完整排查思路是什么？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag star">体系题</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>分四步闭环：<b>发现 → 定位 → 分析 → 优化</b>。</p>
+        <ul>
+          <li><b>发现：</b>慢查询日志（<code>slow_query_log=ON</code>，<code>long_query_time</code> 按业务定，线上常设 0.5~1s；也可接 PMM / 阿里 DAS 类监控）；</li>
+          <li><b>定位：</b><code>pt-query-digest</code> 聚合出 TOP N 慢 SQL（按总耗时排序而非单次）；</li>
+          <li><b>分析：</b><code>EXPLAIN</code> 看 type、key、rows、Extra；确认是否走索引、回表量、filesort / temporary；</li>
+          <li><b>优化：</b>按层面改——SQL 写法 / 加或改索引（覆盖索引、联合索引）/ 表结构（字段类型、大字段拆分）/ 参数（buffer pool）→ 极限场景才上缓存、读写分离、分库分表；</li>
+          <li><b>验证：</b>上线前后对比执行计划与耗时，监控回归。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>SQL 一直很快、某天突然慢了，可能是什么？（统计信息漂移、执行计划翻转、数据量跨过临界点、缓冲池失效、锁等待、主机 IO 争用）</li>
+          <li>慢查询日志会不会本身拖慢性能？</li>
+          <li>除了 SQL 层面，还能从哪些层面优化？（架构、硬件、参数三板斧）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">18</div>
+      <div>
+        <div class="q-title">EXPLAIN 输出里最该关注哪些字段？type 和 Extra 的常见值分别意味着什么？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">工具</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p>重点看五个字段：</p>
+        <ul>
+          <li><b>type（访问类型，性能从好到差）：</b><code>system &gt; const</code>（主键/唯一键等值）<code>&gt; eq_ref</code>（关联时主键匹配）<code>&gt; ref</code>（普通索引等值）<code>&gt; range</code>（索引范围）<code>&gt; index</code>（扫全索引）<code>&gt; ALL</code>（全表扫描）。<b>线上要求至少 range，ALL 必须优化</b>；</li>
+          <li><b>key / possible_keys：</b>实际用了哪个索引，NULL 就是没走；</li>
+          <li><b>rows：</b>预估扫描行数，数量级判断回表代价；</li>
+          <li><b>Extra：</b><code>Using index</code>=覆盖索引（好）；<code>Using filesort</code>=额外排序；<code>Using temporary</code>=临时表（这两个出现要警惕）；<code>Using index condition</code>=索引下推；</li>
+          <li><b>id：</b>相同从上往下执行，不同从大到小（子查询先执行）。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li><code>Using filesort</code> 一定有性能问题吗？怎么消掉？（联合索引让 ORDER BY 走索引序）</li>
+          <li><code>index</code> 和 <code>ALL</code> 的区别？（全索引扫描 vs 全表扫描，索引更小但仍是全量）</li>
+          <li>8.0 的 <code>EXPLAIN ANALYZE</code> 比 EXPLAIN 多了什么？（真实执行 + 每步耗时/行数）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">19</div>
+      <div>
+        <div class="q-title">深分页 LIMIT 1000000, 10 为什么慢？怎么优化？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag">实战</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p><code>LIMIT 1000000, 10</code> 会真实扫描并回表 100 万零 10 行，然后丢掉前 100 万行——慢在「白白回表」。</p>
+        <p>三种优化，按优先级：</p>
+        <ul>
+          <li><b>延迟关联（子查询 + 覆盖索引）：</b>先用覆盖索引拿到目标主键，再回表 10 行：
+            <code>SELECT t.* FROM t JOIN (SELECT id FROM t ORDER BY x LIMIT 1000000, 10) tmp ON t.id = tmp.id</code>，扫描全在二级索引上完成，回表只剩 10 次；</li>
+          <li><b>游标 / 书签分页：</b>记住上一页最后一条的排序值，<code>WHERE id &gt; ? ORDER BY id LIMIT 10</code>，复杂度 O(1)，但要求连续翻页（适合信息流）；</li>
+          <li><b>业务限制：</b>限制最大页数、跳转指定页（产品侧解决，成本最低）。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>为什么子查询写法能变快？本质减少的是什么开销？（回表次数）</li>
+          <li>游标分页排序字段不唯一怎么办？（加 id 做次级排序键）</li>
+          <li>ES / 大数据场景下的深分页问题了解吗？（search_after 与之同理）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="q">
+    <div class="q-head">
+      <div class="q-no">20</div>
+      <div>
+        <div class="q-title">什么时候才需要分库分表？怎么选分片键？会带来哪些新问题？</div>
+        <div class="q-tags"><span class="tag hot">高频必考</span><span class="tag star">架构题</span></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="lbl lbl-ans">简答版（30 秒）</div>
+      <div class="ans">
+        <p><b>先说克制：</b>单表几百万行、单库未到瓶颈时，优先索引优化 / 读写分离 / 归档冷数据——分库分表是最后手段，不可逆。</p>
+        <ul>
+          <li><b>什么时候上：</b>单表数据量持续增长导致 B+ 树变高、维护成本剧增（经验值 2000 万级，视行宽而定）；或单实例写入 QPS / 磁盘 / 连接数到物理上限；</li>
+          <li><b>拆法：</b>垂直分库（按业务域拆：订单库/用户库）、垂直分表（冷热/大字段分离）、水平分表（按分片键行拆）；</li>
+          <li><b>分片键：</b>选<b>查询最高频的等值维度</b>（如 user_id），保证流量均摊、不出现数据倾斜；用基因法或冗余解决跨维度查询（按 user 分片又要按商家查 → 异构索引表 / 宽表）；</li>
+          <li><b>新问题：</b>跨分片 JOIN / 聚合（count、分页）、分布式事务、全局唯一 ID（雪花 / 号段）、扩容迁移（一致性哈希 / 双写迁移）。中间件常见 ShardingSphere、MyCat。</li>
+        </ul>
+      </div>
+      <div class="follow">
+        <div class="fl">🔍 面试官可能追问</div>
+        <ul>
+          <li>分表后全局 ID 怎么生成？雪花算法的时钟回拨问题？</li>
+          <li>分了 16 张表不够用了怎么扩到 64 张？怎么平滑迁移？（双写 + 存量迁移 + 切读）</li>
+          <li>不分库分表还有什么替代方案？（TiDB 等 NewSQL 的取舍，你态度可以保守但要说出理由）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 学习资源 -->
+<!-- ============================================================ -->
+<section id="sec-res">
+  <div class="cat-head"><span class="cat-num">📚</span><h2>深入学习资源推荐</h2></div>
+  <p class="cat-desc" style="margin-left:0">按「官方优先、长期可访问、免费优先」筛选，覆盖从入门补基础到进阶内核的全路径。</p>
+  <div class="res-grid">
+    <div class="res">
+      <h3><span class="res-type doc">官方文档</span>MySQL 8.0 Reference Manual</h3>
+      <p><a href="https://dev.mysql.com/doc/refman/8.0/en/" target="_blank">dev.mysql.com/doc/refman/8.0/en</a></p>
+      <p>最权威的一手资料，重点读 InnoDB 章节：锁与事务模型（<code>/innodb-locking-transaction-model.html</code>）与 MVCC 相关内容。</p>
+      <div class="fit"><b>适合：</b>有一定英文阅读能力、想「知其所以然」的进阶学者　<b>补齐：</b>Q1/8/13/14 的权威出处，面试答案的最终裁判</div>
+    </div>
+    <div class="res">
+      <h3><span class="res-type blog">专栏</span>《MySQL 实战 45 讲》— 林晓斌（极客时间）</h3>
+      <p><a href="https://time.geekbang.org/column/intro/100020801" target="_blank">time.geekbang.org</a>（付费专栏）</p>
+      <p>从一条 SQL 的执行讲到大事务 / 幻读 / 间隙锁加锁规则，以「实验验证」著称，与本文档题目高度对应。</p>
+      <div class="fit"><b>适合：</b>1–3 年主力补强，边读边在本地复现　<b>补齐：</b>Q7/10/13/14 幻读与加锁规则的全部细节</div>
+    </div>
+    <div class="res">
+      <h3><span class="res-type book">书籍</span>《高性能 MySQL》（第 4 版，O'Reilly）</h3>
+      <p>中文版由宁青、李海鹏等译。第 4 版更新到 MySQL 8.0，索引、查询优化、运维章节都是业界标准参考。</p>
+      <div class="fit"><b>适合：</b>想系统化打底、准备往资深 / DBA 方向走的同学　<b>补齐：</b>Q4/17/18 索引设计与优化方法论</div>
+    </div>
+    <div class="res">
+      <h3><span class="res-type blog">开源社区</span>淘宝数据库内核月报（InnoDB 内核）</h3>
+      <p><a href="http://mysql.taobao.org/monthly/" target="_blank">mysql.taobao.org/monthly</a></p>
+      <p>阿里巴巴数据库团队的开源技术月报存档，InnoDB 源码级解析（redo/undo、锁实现、刷脏页），全部免费、无需注册。</p>
+      <div class="fit"><b>适合：</b>3 年+ 冲刺大厂、想聊内核细节的人　<b>补齐：</b>Q8/12/13 日志与锁的底层实现</div>
+    </div>
+    <div class="res">
+      <h3><span class="res-type video">视频</span>MySQL 高级篇视频课（B 站免费）</h3>
+      <p>在 B 站搜索「MySQL 高级篇」或「MySQL 索引 事务 锁」，尚硅谷宋红康老师等讲师的课程口碑稳定，适合视觉/实验型学习。</p>
+      <div class="fit"><b>适合：</b>0–2 年、喜欢跟视频边敲边学的入门者　<b>补齐：</b>全文所有主题的第一遍扫盲 + 环境实操</div>
+    </div>
+    <div class="res">
+      <h3><span class="res-type doc">官方工具</span>MySQL Server Blog / Worklog 与 GitHub</h3>
+      <p><a href="https://github.com/mysql/mysql-server" target="_blank">github.com/mysql/mysql-server</a></p>
+      <p>8.0 起官方源码完全开放，Worklog 里能看到每个特性（如 8.0 的窗口函数、原子 DDL、降序索引）的设计文档，是终极参考。</p>
+      <div class="fit"><b>适合：</b>面试中被问住后想「挖到根」的人　<b>补齐：</b>任何争议问题的最终答案</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  MySQL 面试题大全 · 面向 1–3 年经验后端社招 · 共 20 题 / 5 图解 / 5 类资源<br>
+  建议使用方式：先自测「简答版」能否 30 秒口述 → 再过追问点查漏 → 图解题反复画给自己听
+</footer>
+
+</div>
+</body>
+</html>

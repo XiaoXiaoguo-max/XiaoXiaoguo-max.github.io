@@ -12,9 +12,19 @@
   // 文件名白名单：仅允许中英文、数字、下划线、短横线，杜绝路径穿越
   var SAFE_NAME = /^[A-Za-z0-9_\-\u4e00-\u9fa5]{1,80}$/;
 
-  // 只放行安全协议，防 javascript: 伪协议注入
+  // 只放行安全协议与站内相对路径，防 javascript: 伪协议注入与路径穿越
   function safeUrl(u) {
-    return /^(https?:\/\/|mailto:|\/|\.\/|#)/i.test(String(u || '')) ? u : '#';
+    var s = String(u || '').trim();
+    if (/^https?:\/\//i.test(s) || /^mailto:/i.test(s)) return s; // 外链白名单
+    if (s.charAt(0) === '#') return s;                            // 页内锚点
+    if (/^\/\//.test(s)) return '#';                              // 协议相对跳转 → 拒绝
+    if (s.indexOf('..') >= 0) return '#';                         // 路径穿越 → 拒绝
+    if (s.charAt(0) === '/') return s;                            // 根相对路径
+    // 站内相对文件：xxx.html / dir/xxx.html（可带 ?query 与 #hash）
+    if (/^[A-Za-z0-9_\-\u4e00-\u9fa5][A-Za-z0-9_\-.\/\u4e00-\u9fa5]*\.(html?|json|md)(\?[^#\s]*)?(#\S*)?$/i.test(s)) {
+      return s;
+    }
+    return '#';
   }
 
   function fetchText(url) {
@@ -111,7 +121,11 @@
     var navEl = doc.getElementById('site-nav');
     if (navEl && Array.isArray(cfg.links) && cfg.links.length) {
       navEl.insertAdjacentHTML('beforeend', cfg.links.map(function (l) {
-        return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener noreferrer">' +
+        var url = safeUrl(l.url);
+        // 站内相对链接当前页打开，外链才新窗口
+        var external = /^https?:\/\//i.test(url);
+        return '<a href="' + esc(url) + '"' +
+          (external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
           esc(l.text) + '</a>';
       }).join(''));
     }
