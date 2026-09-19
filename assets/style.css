@@ -157,9 +157,15 @@ a:hover { text-decoration: underline; }
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  transition: color .16s, border-color .16s, transform .16s;
+  transition: color .16s, border-color .16s, background-color .16s;
 }
-.theme-toggle:hover { color: var(--accent); border-color: var(--accent); transform: rotate(12deg); }
+/* hover 只做颜色反馈，不做任何旋转/形变，避免点击后指针仍悬停时按钮"变斜" */
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 footer.site-footer {
   border-top: 1px solid var(--border);
